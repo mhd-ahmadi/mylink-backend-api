@@ -1,0 +1,9 @@
+[tasks.dev]
+workspace = false
+command = "cargo-watch"
+args = ["-x", "run -p webapi"]
+
+
+[tasks.build]
+command = "cargo"
+args = ["build", "--workspace"]

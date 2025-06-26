@@ -1,0 +1,11 @@
+/target
+**/*.log
+**/*.tmp
+.DS_Store
+*.sqlite
+node_modules/
+/.idea/
+/.vscode/
+/*.lock
+# پوشه‌ی cache مربوط به sqlx
+sqlx-data.json
