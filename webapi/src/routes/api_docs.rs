@@ -7,7 +7,8 @@ use utoipa::{
 #[openapi(
     modifiers(&SecurityAddon),
     paths(
-        crate::handlers::auth::signup::signup,
+        crate::handlers::auth::sign_in::sign_in,
+        crate::handlers::auth::sign_up::sign_up,
 
         crate::handlers::post::create::create_post,
         crate::handlers::post::get_all::get_all_posts,

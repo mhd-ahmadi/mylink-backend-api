@@ -6,20 +6,19 @@ mod routes;
 
 use std::{
     net::{Ipv4Addr, SocketAddr},
-    sync::Arc,
-    time::Duration,
+    sync::Arc
 };
 
 use axum::{
-    Extension, Router, error_handling::HandleErrorLayer, http::StatusCode,
-    middleware::from_extractor, response::IntoResponse, routing::get, serve,
+    Extension, Router, http::StatusCode,
+    middleware::from_extractor,routing::get, serve,
 };
 
 use base::configuration::Configuration;
 use base::cors_config::cors_config;
 use base::pg_connection::create_pg_connection;
 use sqlx::{Pool, Postgres};
-use tower::{BoxError, ServiceBuilder};
+use tower::{BoxError};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -65,7 +64,7 @@ async fn main() -> Result<(), Error> {
     let router: Router =
         router.merge(SwaggerUi::new("/swagger").url("/docs/openapi.json", api.clone()));
 
-    let address: SocketAddr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8070));
+    let address: SocketAddr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3000));
     let listener: TcpListener = TcpListener::bind(&address).await?;
     serve(listener, router.into_make_service()).await
 }

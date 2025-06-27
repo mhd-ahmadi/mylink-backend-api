@@ -1,5 +1,10 @@
+use chrono::{DateTime, Utc};
+use sqlx::FromRow;
+
+#[derive(FromRow)]
 pub struct User {
-    id: i32,
-    username: String,
-    hashed_password: String,
+    pub id: i32,
+    pub username: String,
+    pub password_hash: String,
+    pub created_on_utc: DateTime<Utc>,
 }
