@@ -18,16 +18,15 @@ use domain::{
 use serde_json::json;
 use utils::password_hasher::PasswordHasher;
 
-#[utoipa::path(post, path = "/auth/signup", tag = "Auth")]
-pub async fn signup(
+#[utoipa::path(post, path = "/auth/sign_up", tag = "Auth")]
+pub async fn sign_up(
     Extension(state): Extension<Arc<AppState>>,
     request: Valid<Json<SignUpRequest>>,
 ) -> ApiResponse {
-
+    let user_repo = PgUserRepository::new(Arc::new(state.db.clone()));
+    
     let hasher= PasswordHasher::new();
     let hash=hasher.hash_password(&request.password).expect("Failed to hash");
-
-    let user_repo = PgUserRepository::new(Arc::new(state.db.clone()));
 
     let user_model = UserCreateModel {
         password_hash: hash,

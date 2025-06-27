@@ -16,7 +16,7 @@ utoipa-swagger-ui = {version="9.0.2", features=["axum"]}
 utoipa-axum = "0.2.0"
 axum-valid = "0.23.0"
 jsonwebtoken = "9.3.1"
-chrono = "0.4.41"
+chrono = { version = "0.4.41", features = ["serde"] }
 futures = "0.3.31"
 tower-http = { version = "0.6.6", features = ["catch-panic", "cors"] }
 tower = "0.5.2"

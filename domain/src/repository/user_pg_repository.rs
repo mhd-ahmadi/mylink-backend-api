@@ -1,8 +1,10 @@
 use async_trait::async_trait;
 use sqlx::PgPool;
 use std::sync::Arc;
+use chrono::Utc;
 
 use crate::{
+    entities::user::User,
     models::users::user_create_model::UserCreateModel,
     repository::contracts::user_repository::UserRepository,
 };
@@ -20,10 +22,28 @@ impl PgUserRepository {
 #[async_trait]
 impl UserRepository for PgUserRepository {
     async fn save(&self, user: &UserCreateModel) {
-        let _ = sqlx::query("INSERT INTO users(username, password_hash2) VALUES ($1, $2)")
+        let now = Utc::now();
+        let _ = sqlx::query("INSERT INTO users(username, password_hash, created_on_utc) VALUES ($1, $2, $3)")
             .bind(&user.username)
             .bind(&user.password_hash)
+            .bind(now)
             .execute(&*self.pool)
             .await;
+    }
+
+    async fn find_by_username(&self, username: &str) -> Result<Option<User>, sqlx::Error> {
+        let row = sqlx::query_as!(
+            User,
+            r#"
+            SELECT id, username, password_hash, created_on_utc
+            FROM users
+            WHERE username = $1
+            "#,
+            username
+        )
+        .fetch_optional(&*self.pool)
+        .await;
+
+        row
     }
 }
