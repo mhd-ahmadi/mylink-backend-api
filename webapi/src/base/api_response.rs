@@ -20,6 +20,7 @@ where
     pub message: Option<String>,
     pub messages: Option<Vec<String>>,
     pub exception: Option<serde_json::Value>,
+    pub status: u16,
 }
 
 pub struct ApiHttpResponseBuilder<T>
@@ -30,6 +31,7 @@ where
     message: Option<String>,
     messages: Option<Vec<String>>,
     exception: Option<serde_json::Value>,
+    status: Option<StatusCode>,
 }
 
 impl<T> ApiHttpResponseBuilder<T>
@@ -56,12 +58,20 @@ where
         self
     }
 
+    pub fn with_status(mut self, status: StatusCode) -> Self {
+        self.status = Some(status);
+        self
+    }
+
     pub fn build(self) -> ApiHttpResponse<T> {
         ApiHttpResponse {
             data: self.data,
             message: self.message,
             messages: self.messages,
             exception: self.exception,
+            status: self
+                .status
+                .map_or(StatusCode::OK.as_u16(), |s| s.as_u16()),
         }
     }
 }
@@ -76,6 +86,7 @@ where
             message: None,
             messages: None,
             exception: None,
+            status: None,
         }
     }
 
@@ -85,6 +96,7 @@ where
             message: None,
             messages: None,
             exception: None,
+            status: None,
         }
     }
 }
@@ -94,13 +106,9 @@ where
     T: Serialize,
 {
     fn into_response(self) -> Response {
-        let status = if self.data.is_some() {
-            StatusCode::OK
-        } else {
-            StatusCode::INTERNAL_SERVER_ERROR
-        };
-
-        (status, Json(self)).into_response()
+        let status_code =
+            StatusCode::from_u16(self.status).unwrap_or(StatusCode::OK);
+        (status_code, Json(self)).into_response()
     }
 }
 

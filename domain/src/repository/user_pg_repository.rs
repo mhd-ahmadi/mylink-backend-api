@@ -1,3 +1,6 @@
+use anyhow::{Error, Result};
+use anyhow::anyhow;
+
 use async_trait::async_trait;
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -19,11 +22,14 @@ impl PgUserRepository {
 
 #[async_trait]
 impl UserRepository for PgUserRepository {
-    async fn save(&self, user: &UserCreateModel) {
-        let _ = sqlx::query("INSERT INTO users(username, password_hash2) VALUES ($1, $2)")
+    async fn save(&self, user: &UserCreateModel) -> Result<(), Error> {
+        sqlx::query("INSERT INTO users(username2, password_hash2) VALUES ($1, $2)")
             .bind(&user.username)
             .bind(&user.password_hash)
             .execute(&*self.pool)
-            .await;
+            .await
+            //.map_err(|e| e.to_string())?;
+            .map_err(|e| anyhow!("خطای SQL: {:?}", e))?;
+        Ok(())
     }
 }

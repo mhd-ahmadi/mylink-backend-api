@@ -7,13 +7,19 @@ mod routes;
 use std::{
     net::{Ipv4Addr, SocketAddr},
     sync::Arc,
+    time::Duration,
 };
 
-use axum::{Extension, Router, middleware::from_extractor, routing::get, serve};
+use axum::{
+    Extension, Router, error_handling::HandleErrorLayer, http::StatusCode,
+    middleware::from_extractor, response::IntoResponse, routing::get, serve,
+};
+
 use base::configuration::Configuration;
 use base::cors_config::cors_config;
 use base::pg_connection::create_pg_connection;
 use sqlx::{Pool, Postgres};
+use tower::{BoxError, ServiceBuilder};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -23,8 +29,15 @@ use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 
 use routes::api_docs::ApiDoc;
-use utoipa::OpenApi;
 use std::io::Error;
+use utoipa::OpenApi;
+
+async fn handle_error(err: BoxError) -> (StatusCode, String) {
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        format!("خطای داخلی: {}", err),
+    )
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
